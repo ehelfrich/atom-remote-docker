@@ -5,21 +5,21 @@
 start_tunnel()
 {
 	#Start tunnel logic'
-	SSHPID=$(pgrep -f 'ssh -q -f eric@$target -L 22222:localhost:22222 -N')
+	SSHPID=$(pgrep -f 'ssh -q -f $user@$target -L 22222:localhost:22222 -N')
 	echo "Connecting to $target and launching notebook"
 }
 
 start_docker()
 {
 	#Remote Script checks for already running notebook and does not start second
-	ssh -t -q eric@$target "/home/eric/scripts/start_atom_docker.sh" &
+	ssh -t -q $user@$target "/home/$user/scripts/start_atom_docker.sh" &
 	echo "Remote docker notebook started on $target"
 	sleep 2
 
 	echo "Enabling SSH port forwarding"
 	sleep 1
 	if [[ $SSHPID == "" ]]; then
-		ssh -q -f eric@$target -L 22222:localhost:22222 -N &
+		ssh -q -f $user@$target -L 22222:localhost:22222 -N &
 	else
 		echo "Tunnel Already Created"
 	fi
@@ -27,7 +27,7 @@ start_docker()
 
 stop_tunnel()
 {
-	PID=$(pgrep -f "ssh -q -f eric@$target -L 22222:localhost:22222 -N")
+	PID=$(pgrep -f "ssh -q -f $user@$target -L 22222:localhost:22222 -N")
 	i=1
 	echo "Stopping SSH port forwarding"
 	sleep 1
@@ -38,10 +38,10 @@ stop_tunnel()
 	 		echo "Running: " && echo $PID
 			echo "Attempting to Killing PID"
 			sleep 1
-			pkill -f "ssh -q -f eric@$target -L 22222:localhost:22222 -N"
+			pkill -f "ssh -q -f $user@$target -L 22222:localhost:22222 -N"
 			sleep 1
 			((++i))
-			PID=$(pgrep -f "ssh -q -f eric@$target -L 22222:localhost:22222 -N")
+			PID=$(pgrep -f "ssh -q -f $user@$target -L 22222:localhost:22222 -N")
 		done
 
 		if [ $i -ge 3 ]; then
@@ -62,18 +62,18 @@ stop_tunnel()
 stop_docker()
 {
 	#Stop Remote Notebook Logic
-	PID=$(pgrep -f "ssh -q -f eric@$target -L 22222:localhost:22222 -N")
+	PID=$(pgrep -f "ssh -q -f $user@$target -L 22222:localhost:22222 -N")
 	i=1
 
 	echo "Stopping Remote Notebook and SSH Tunnel"
 	sleep 1
-	ssh eric@$target "bash /home/eric/scripts/stop_atom_docker.sh" &
+	ssh $user@$target "bash /home/$user/scripts/stop_atom_docker.sh" &
 	echo "Notebook Killed"
 }
 
 usage()
 {
-	echo "usage: remote-jupyter [[[-t target (.local.lan) ] [-a action]] | [-h]]"
+	echo "usage: remote-jupyter [[[-t target (.local.lan)] [-u user] [-a action]] | [-h]]"
 }
 
 ######## Main
@@ -84,6 +84,9 @@ while [ "$1" != "" ]; do
 	case "$1" in
 		-t | --target )		shift
 							target=$1
+							;;
+		-u | --user )     shift
+							user=$1
 							;;
 		-a | --action ) 	shift
 							action=$1
