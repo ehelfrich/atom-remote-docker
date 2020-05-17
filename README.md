@@ -1,6 +1,6 @@
 # Guide to setting up remote kernels in docker containers for Atom
 
-This guide will provide the steps needed to setup a docker image on a remote server/computer and then use SSH port forwarding to allow the Atom IDE on a remote machine on the same network to connection to the Jupyter kernels and run code remotely
+This guide will provide the steps needed to setup a docker image on a remote server/computer and then use SSH port forwarding to allow the Atom IDE on a remote machine in the same network to connect to the Jupyter kernels and run code remotely
 
 ---
 ## Remote Server Setup
@@ -58,11 +58,11 @@ Place the file `remote-atom` on your client computer in a directory that is in y
 
 Usage:
 ```
-remote-atom -t <target> -a <action>
-ex. remote-atom -t ubuntu-server.local.lan -a start
+remote-atom -t <target> -u <user> -a <action>
+ex. remote-atom -t ubuntu-server.local.lan -u Tim -a start
 ```
 
-_There are some limitations with the script.  It assumes that your local network uses .local.lan and you need to specify your user in the script.  You will also need to have setup SSH certificates between the client and the server._
+_There are some limitations with the script.  It assumes that your local network uses .local.lan.  You will also need to have setup SSH certificates between the client and the server._
 
 ---
 
